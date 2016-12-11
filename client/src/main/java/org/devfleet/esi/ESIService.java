@@ -3,7 +3,7 @@ package org.devfleet.esi;
 import java.lang.*;
 import java.util.List;
 
-public interface EsiService {
+public interface ESIService {
 
     Character getCharacter(final Long charID);
 

@@ -33,7 +33,7 @@ class CharacterAPIImpl {
 
     public Character getCharacter(Long charID) {
       try {
-          Character character = EsiTransformer.transform(
+          Character character = ESITransformer.transform(
                   charID,
                   this.characterApi
                   .getCharactersCharacterId(charID.intValue(), this.datasource)
@@ -78,7 +78,7 @@ class CharacterAPIImpl {
                             .getCharactersCharacterIdCalendarEventId(charID, object.getEventId(), this.datasource)
                             .execute()
                             .body();
-            to.add(EsiTransformer.transform(object, event));
+            to.add(ESITransformer.transform(object, event));
         }
         catch (IOException e) {
             LOG.debug(e.getLocalizedMessage(), e);
@@ -147,7 +147,7 @@ class CharacterAPIImpl {
                             .execute()
                             .body();
             for (GetCharactersCharacterIdCorporationhistory200Ok h: history) {
-                to.add(EsiTransformer.transform(h));
+                to.add(ESITransformer.transform(h));
             }
         }
         catch (IOException e) {

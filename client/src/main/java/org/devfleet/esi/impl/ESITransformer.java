@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-class EsiTransformer {
+class ESITransformer {
 
-    private EsiTransformer() {}
+    private ESITransformer() {}
 
     public static Character transform(final long charID, final GetCharactersCharacterIdOk c) {
         final Character character = new Character(charID);

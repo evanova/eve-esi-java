@@ -12,7 +12,7 @@ This repository is a wrapper Java API around the [EVE Swagger Interface](https:/
     -   On Linux/Mac: `./gradlew build`
     -   On Windows:   `gradlew.bat build`
 
-*   Look at `org.devfleet.esi.EsiClient`. You should know what to do.
+*   Look at `org.devfleet.esi.ESIClient`. You should know what to do.
 
 ## Status
 

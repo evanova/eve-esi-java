@@ -66,7 +66,7 @@ class MailAPIImpl {
                     afterMailID.intValue(),
                     this.datasource)
                     .execute().body()) {
-                mails.add(EsiTransformer.transform(object));
+                mails.add(ESITransformer.transform(object));
             }
             return mails;
         }
@@ -84,13 +84,13 @@ class MailAPIImpl {
                     .getCharactersCharacterIdMailLists(charID.intValue(), this.datasource)
                     .execute()
                     .body()) {
-                mailboxes.add(EsiTransformer.transform(object));*/
+                mailboxes.add(ESITransformer.transform(object));*/
                 for (GetCharactersCharacterIdMailLabelsOkLabels object:
                         mailApi.getCharactersCharacterIdMailLabels(charID.intValue(), this.datasource)
                         .execute()
                         .body()
                         .getLabels()) {
-                mailboxes.add(EsiTransformer.transform(object));
+                mailboxes.add(ESITransformer.transform(object));
             }
             return mailboxes;
         }
@@ -102,7 +102,7 @@ class MailAPIImpl {
 
     public Mail getMailContent(Long charID, Long mailID) {
         try {
-            return EsiTransformer.transform(
+            return ESITransformer.transform(
                     mailApi.getCharactersCharacterIdMailMailId(
                     charID.intValue(),
                     mailID.intValue(),
@@ -120,7 +120,7 @@ class MailAPIImpl {
         try {
             return mailApi.postCharactersCharacterIdMail(
                     charID.intValue(),
-                    EsiTransformer.transform(mail),
+                    ESITransformer.transform(mail),
                     this.datasource)
                     .execute()
                     .body();
@@ -136,7 +136,7 @@ class MailAPIImpl {
             return mailApi.putCharactersCharacterIdMailMailId(
                     charID.intValue(),
                     mail.getId().intValue(),
-                    EsiTransformer.transform2(mail),
+                    ESITransformer.transform2(mail),
                     this.datasource)
                     .execute()
                     .isSuccessful();
@@ -164,7 +164,7 @@ class MailAPIImpl {
                     killMailApi.getCharactersCharacterIdKillmailsRecent(charID.intValue(), maxCount, maxKillID.intValue(), this.datasource)
                     .execute()
                     .body()) {
-                KillMail km = EsiTransformer.transform(m);
+                KillMail km = ESITransformer.transform(m);
                 if (withContent) {
                     km = getKillMail(km);
                 }

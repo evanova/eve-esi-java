@@ -30,7 +30,7 @@ class CorporationAPIImpl {
     public Corporation getCorporation(Long corpID) {
         try {
             Corporation corporation =
-                    EsiTransformer.transform(
+                    ESITransformer.transform(
                         corpID,
                         this.corporationApi
                         .getCorporationsCorporationId(corpID.intValue(), this.datasource)
@@ -55,7 +55,7 @@ class CorporationAPIImpl {
                     .body();
             final List<Corporation.Member> r = new ArrayList<>(members.size());
             for (GetCorporationsCorporationIdMembers200Ok m: members) {
-                r.add(EsiTransformer.transform(m));
+                r.add(ESITransformer.transform(m));
             }
             return r;
         }
@@ -91,7 +91,7 @@ class CorporationAPIImpl {
                             .execute()
                             .body();
             for (GetCorporationsCorporationIdAlliancehistory200Ok h: history) {
-                to.add(EsiTransformer.transform(h));
+                to.add(ESITransformer.transform(h));
             }
         }
         catch (IOException e) {

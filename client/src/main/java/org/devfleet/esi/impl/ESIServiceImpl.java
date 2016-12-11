@@ -3,7 +3,7 @@ package org.devfleet.esi.impl;
 import org.devfleet.esi.Calendar;
 import org.devfleet.esi.Character;
 import org.devfleet.esi.Corporation;
-import org.devfleet.esi.EsiService;
+import org.devfleet.esi.ESIService;
 import org.devfleet.esi.KillMail;
 import org.devfleet.esi.Mail;
 import org.devfleet.esi.Mailbox;
@@ -11,17 +11,17 @@ import org.devfleet.esi.client.ApiClient;
 
 import java.util.List;
 
-public class EsiServiceImpl implements EsiService {
+public class ESIServiceImpl implements ESIService {
 
     private final CharacterAPIImpl characterImpl;
     private final CorporationAPIImpl corporationImpl;
     private final MailAPIImpl mailImpl;
 
-    public EsiServiceImpl(final ApiClient client) {
+    public ESIServiceImpl(final ApiClient client) {
         this(client, "tranquility");
     }
 
-    public EsiServiceImpl(final ApiClient client, final String datasource) {
+    public ESIServiceImpl(final ApiClient client, final String datasource) {
         this.characterImpl = new CharacterAPIImpl(client, datasource);
         this.corporationImpl = new CorporationAPIImpl(client, datasource);
         this.mailImpl = new MailAPIImpl(client, datasource);
