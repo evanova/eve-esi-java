@@ -1,8 +1,8 @@
 package org.devfleet.esi;
 
-import java.lang.*;
 import java.util.List;
 
+/** Facade toward all ESI APIs.*/
 public interface ESIService {
 
     Character getCharacter(final Long charID);

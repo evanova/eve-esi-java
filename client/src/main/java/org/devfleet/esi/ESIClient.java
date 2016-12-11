@@ -1,13 +1,13 @@
 package org.devfleet.esi;
 
 import org.apache.oltu.oauth2.common.token.BasicOAuthToken;
+import org.devfleet.esi.client.ApiClient;
 import org.devfleet.esi.client.auth.OAuth;
 import org.devfleet.esi.impl.ESIServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.devfleet.esi.client.ApiClient;
-
+//Note: this class will most likely be changed in the future.
 public class ESIClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESIClient.class);
