@@ -4,7 +4,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.devfleet.esi.KillMail;
 import org.devfleet.esi.Mail;
 import org.devfleet.esi.Mailbox;
-import org.devfleet.esi.api.LiveApi;
+import org.devfleet.esi.api.KillmailsApi;
+import org.devfleet.esi.api.MailApi;
+import org.devfleet.esi.client.ApiClient;
 import org.devfleet.esi.model.GetCharactersCharacterIdKillmailsRecent200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdMail200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdMailLabelsOkLabels;
@@ -22,18 +24,20 @@ class MailAPIImpl {
 
     private static Logger LOG = LoggerFactory.getLogger(MailAPIImpl.class);
 
-    private final LiveApi liveApi;
+    private final MailApi mailApi;
+    private final KillmailsApi killMailApi;
     private final String datasource;
 
-    public MailAPIImpl(String datasource, LiveApi liveApi) {
+    public MailAPIImpl(final ApiClient client, final String datasource) {
 
-        this.liveApi = liveApi;
+        this.mailApi = client.createService(MailApi.class);
+        this.killMailApi = client.createService(KillmailsApi.class);
         this.datasource = datasource;
     }
 
     public boolean deleteMail(Long charID, Long mailID) {
         try {
-            return this.liveApi
+            return this.mailApi
                 .deleteCharactersCharacterIdMailMailId(
                     charID.intValue(),
                     mailID.intValue(),
@@ -56,7 +60,7 @@ class MailAPIImpl {
             }
             final List<Mail> mails = new ArrayList<>();
             for (GetCharactersCharacterIdMail200Ok object:
-                this.liveApi.getCharactersCharacterIdMail(
+                this.mailApi.getCharactersCharacterIdMail(
                     charID.intValue(),
                     params,
                     afterMailID.intValue(),
@@ -76,13 +80,13 @@ class MailAPIImpl {
         try {
             final List<Mailbox> mailboxes = new ArrayList<>();
             /*for (GetCharactersCharacterIdMailLists200OkObject object:
-                    this.liveApi
+                    this.mailApi
                     .getCharactersCharacterIdMailLists(charID.intValue(), this.datasource)
                     .execute()
                     .body()) {
                 mailboxes.add(EsiTransformer.transform(object));*/
                 for (GetCharactersCharacterIdMailLabelsOkLabels object:
-                        liveApi.getCharactersCharacterIdMailLabels(charID.intValue(), this.datasource)
+                        mailApi.getCharactersCharacterIdMailLabels(charID.intValue(), this.datasource)
                         .execute()
                         .body()
                         .getLabels()) {
@@ -99,7 +103,7 @@ class MailAPIImpl {
     public Mail getMailContent(Long charID, Long mailID) {
         try {
             return EsiTransformer.transform(
-                    liveApi.getCharactersCharacterIdMailMailId(
+                    mailApi.getCharactersCharacterIdMailMailId(
                     charID.intValue(),
                     mailID.intValue(),
                     this.datasource)
@@ -114,7 +118,7 @@ class MailAPIImpl {
 
     public Integer postMail(Long charID, Mail mail) {
         try {
-            return liveApi.postCharactersCharacterIdMail(
+            return mailApi.postCharactersCharacterIdMail(
                     charID.intValue(),
                     EsiTransformer.transform(mail),
                     this.datasource)
@@ -129,7 +133,7 @@ class MailAPIImpl {
 
     public boolean updateMail(Long charID, Mail mail) {
         try {
-            return liveApi.putCharactersCharacterIdMailMailId(
+            return mailApi.putCharactersCharacterIdMailMailId(
                     charID.intValue(),
                     mail.getId().intValue(),
                     EsiTransformer.transform2(mail),
@@ -157,7 +161,7 @@ class MailAPIImpl {
         try {
             final List<KillMail> kills = new ArrayList<>();
             for (GetCharactersCharacterIdKillmailsRecent200Ok m:
-                    liveApi.getCharactersCharacterIdKillmailsRecent(charID.intValue(), maxCount, maxKillID.intValue(), this.datasource)
+                    killMailApi.getCharactersCharacterIdKillmailsRecent(charID.intValue(), maxCount, maxKillID.intValue(), this.datasource)
                     .execute()
                     .body()) {
                 KillMail km = EsiTransformer.transform(m);
@@ -177,7 +181,7 @@ class MailAPIImpl {
     public KillMail getKillMail(KillMail killMail) {
         try {
             GetKillmailsKillmailIdKillmailHashOk ok =
-                liveApi.getKillmailsKillmailIdKillmailHash(killMail.getId().intValue(), killMail.getHash(), this.datasource)
+                killMailApi.getKillmailsKillmailIdKillmailHash(killMail.getId().intValue(), killMail.getHash(), this.datasource)
                     .execute()
                     .body();
 

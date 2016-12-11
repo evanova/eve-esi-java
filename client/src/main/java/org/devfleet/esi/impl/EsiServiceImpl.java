@@ -7,8 +7,6 @@ import org.devfleet.esi.EsiService;
 import org.devfleet.esi.KillMail;
 import org.devfleet.esi.Mail;
 import org.devfleet.esi.Mailbox;
-
-import org.devfleet.esi.api.LiveApi;
 import org.devfleet.esi.client.ApiClient;
 
 import java.util.List;
@@ -24,13 +22,9 @@ public class EsiServiceImpl implements EsiService {
     }
 
     public EsiServiceImpl(final ApiClient client, final String datasource) {
-        this(datasource, client.createService(LiveApi.class));
-    }
-
-    public EsiServiceImpl(final String datasource, final LiveApi liveApi) {
-        this.characterImpl = new CharacterAPIImpl(datasource, liveApi);
-        this.corporationImpl = new CorporationAPIImpl(datasource, liveApi);
-        this.mailImpl = new MailAPIImpl(datasource, liveApi);
+        this.characterImpl = new CharacterAPIImpl(client, datasource);
+        this.corporationImpl = new CorporationAPIImpl(client, datasource);
+        this.mailImpl = new MailAPIImpl(client, datasource);
     }
 
     @Override

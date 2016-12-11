@@ -2,7 +2,9 @@ package org.devfleet.esi.impl;
 
 import org.devfleet.esi.Calendar;
 import org.devfleet.esi.Character;
-import org.devfleet.esi.api.LiveApi;
+import org.devfleet.esi.api.CalendarApi;
+import org.devfleet.esi.api.CharacterApi;
+import org.devfleet.esi.client.ApiClient;
 import org.devfleet.esi.model.GetCharactersCharacterIdCalendar200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdCalendarEventIdOk;
 import org.devfleet.esi.model.GetCharactersCharacterIdCorporationhistory200Ok;
@@ -18,13 +20,14 @@ class CharacterAPIImpl {
 
     private static Logger LOG = LoggerFactory.getLogger(CharacterAPIImpl.class);
 
-    private final LiveApi liveApi;
+    private final CharacterApi characterApi;
+    private final CalendarApi calendarApi;
+
     private final String datasource;
 
-    public CharacterAPIImpl(
-            String datasource,
-            LiveApi liveApi) {
-        this.liveApi = liveApi;
+    public CharacterAPIImpl(final ApiClient client, final String datasource){
+        this.characterApi = client.createService(CharacterApi.class);
+        this.calendarApi = client.createService(CalendarApi.class);
         this.datasource = datasource;
     }
 
@@ -32,7 +35,7 @@ class CharacterAPIImpl {
       try {
           Character character = EsiTransformer.transform(
                   charID,
-                  this.liveApi
+                  this.characterApi
                   .getCharactersCharacterId(charID.intValue(), this.datasource)
                   .execute()
                   .body());
@@ -50,7 +53,7 @@ class CharacterAPIImpl {
     public Calendar getCalendar(Long charID, Long afterEventID) {
         try {
             List<GetCharactersCharacterIdCalendar200Ok> events =
-                    this.liveApi
+                    this.calendarApi
                     .getCharactersCharacterIdCalendar(charID, (null == afterEventID) ? null : afterEventID.intValue(), this.datasource)
                     .execute()
                     .body();
@@ -71,7 +74,7 @@ class CharacterAPIImpl {
     private void addEvent(final Long charID, final GetCharactersCharacterIdCalendar200Ok object, final Calendar to) {
         try {
             GetCharactersCharacterIdCalendarEventIdOk event =
-                    this.liveApi
+                    this.calendarApi
                             .getCharactersCharacterIdCalendarEventId(charID, object.getEventId(), this.datasource)
                             .execute()
                             .body();
@@ -106,7 +109,7 @@ class CharacterAPIImpl {
 
             PutCharactersCharacterIdCalendarEventIdResponse r =
                     new PutCharactersCharacterIdCalendarEventIdResponse().response(re);
-            this.liveApi
+            this.calendarApi
                     .putCharactersCharacterIdCalendarEventId(charID.intValue(), eventID.intValue(), r, this.datasource)
                     .execute();
             return true;
@@ -121,7 +124,7 @@ class CharacterAPIImpl {
     private void addPortraits(final Character to) {
         try {
             GetCharactersCharacterIdPortraitOk portraits =
-                    this.liveApi
+                    this.characterApi
                             .getCharactersCharacterIdPortrait(to.getId().intValue(), this.datasource)
                             .execute()
                             .body();
@@ -139,7 +142,7 @@ class CharacterAPIImpl {
     private void addHistory(final Character to) {
         try {
             List<GetCharactersCharacterIdCorporationhistory200Ok> history =
-                    this.liveApi
+                    this.characterApi
                             .getCharactersCharacterIdCorporationhistory(to.getId().intValue(), this.datasource)
                             .execute()
                             .body();

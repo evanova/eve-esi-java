@@ -1,7 +1,8 @@
 package org.devfleet.esi.impl;
 
 import org.devfleet.esi.Corporation;
-import org.devfleet.esi.api.LiveApi;
+import org.devfleet.esi.api.CorporationApi;
+import org.devfleet.esi.client.ApiClient;
 import org.devfleet.esi.model.GetCorporationsCorporationIdAlliancehistory200Ok;
 import org.devfleet.esi.model.GetCorporationsCorporationIdIconsOk;
 import org.devfleet.esi.model.GetCorporationsCorporationIdMembers200Ok;
@@ -17,14 +18,12 @@ class CorporationAPIImpl {
 
     private static Logger LOG = LoggerFactory.getLogger(CorporationAPIImpl.class);
 
-    private final LiveApi liveApi;
+    private final CorporationApi corporationApi;
 
     private final String datasource;
 
-    public CorporationAPIImpl(
-            String datasource,
-            LiveApi liveApi) {
-        this.liveApi = liveApi;
+    public CorporationAPIImpl(final ApiClient client, final String datasource) {
+        this.corporationApi = client.createService(CorporationApi.class);
         this.datasource = datasource;
     }
 
@@ -33,7 +32,7 @@ class CorporationAPIImpl {
             Corporation corporation =
                     EsiTransformer.transform(
                         corpID,
-                        this.liveApi
+                        this.corporationApi
                         .getCorporationsCorporationId(corpID.intValue(), this.datasource)
                         .execute()
                         .body());
@@ -51,7 +50,7 @@ class CorporationAPIImpl {
     public List<Corporation.Member> getMembers(Long corpID) {
         try {
             List<GetCorporationsCorporationIdMembers200Ok> members =
-                this.liveApi.getCorporationsCorporationIdMembers(corpID.intValue(), this.datasource)
+                this.corporationApi.getCorporationsCorporationIdMembers(corpID.intValue(), this.datasource)
                     .execute()
                     .body();
             final List<Corporation.Member> r = new ArrayList<>(members.size());
@@ -70,7 +69,7 @@ class CorporationAPIImpl {
     private void addPortraits(final Corporation to) {
         try {
             GetCorporationsCorporationIdIconsOk icons =
-                    this.liveApi
+                    this.corporationApi
                             .getCorporationsCorporationIdIcons(to.getId().intValue(), this.datasource)
                             .execute()
                             .body();
@@ -87,7 +86,7 @@ class CorporationAPIImpl {
     private void addHistory(final Corporation to) {
         try {
             List<GetCorporationsCorporationIdAlliancehistory200Ok> history =
-                    this.liveApi
+                    this.corporationApi
                             .getCorporationsCorporationIdAlliancehistory(to.getId().intValue(), this.datasource)
                             .execute()
                             .body();
