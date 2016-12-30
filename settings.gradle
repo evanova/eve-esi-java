@@ -1,3 +1,4 @@
+include ':swagger'
 include ':client'
 //include ':android'
 

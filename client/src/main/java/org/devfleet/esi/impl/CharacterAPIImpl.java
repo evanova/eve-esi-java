@@ -2,6 +2,7 @@ package org.devfleet.esi.impl;
 
 import org.devfleet.esi.Calendar;
 import org.devfleet.esi.Character;
+import org.devfleet.esi.ESIClient;
 import org.devfleet.esi.api.CalendarApi;
 import org.devfleet.esi.api.CharacterApi;
 import org.devfleet.esi.client.ApiClient;
@@ -12,6 +13,7 @@ import org.devfleet.esi.model.GetCharactersCharacterIdPortraitOk;
 import org.devfleet.esi.model.PutCharactersCharacterIdCalendarEventIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Retrofit;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,9 +27,9 @@ class CharacterAPIImpl {
 
     private final String datasource;
 
-    public CharacterAPIImpl(final ApiClient client, final String datasource){
-        this.characterApi = client.createService(CharacterApi.class);
-        this.calendarApi = client.createService(CalendarApi.class);
+    public CharacterAPIImpl(final Retrofit rf, final String datasource){
+        this.characterApi = rf.create(CharacterApi.class);
+        this.calendarApi = rf.create(CalendarApi.class);
         this.datasource = datasource;
     }
 

@@ -8,6 +8,7 @@ import org.devfleet.esi.model.GetCorporationsCorporationIdIconsOk;
 import org.devfleet.esi.model.GetCorporationsCorporationIdMembers200Ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Retrofit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ class CorporationAPIImpl {
 
     private final String datasource;
 
-    public CorporationAPIImpl(final ApiClient client, final String datasource) {
-        this.corporationApi = client.createService(CorporationApi.class);
+    public CorporationAPIImpl(final Retrofit rf, final String datasource) {
+        this.corporationApi = rf.create(CorporationApi.class);
         this.datasource = datasource;
     }
 

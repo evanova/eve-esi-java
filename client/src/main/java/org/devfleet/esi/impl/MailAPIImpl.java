@@ -13,6 +13,7 @@ import org.devfleet.esi.model.GetCharactersCharacterIdMailLabelsOkLabels;
 import org.devfleet.esi.model.GetKillmailsKillmailIdKillmailHashOk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Retrofit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ class MailAPIImpl {
     private final KillmailsApi killMailApi;
     private final String datasource;
 
-    public MailAPIImpl(final ApiClient client, final String datasource) {
+    public MailAPIImpl(final Retrofit rf, final String datasource) {
 
-        this.mailApi = client.createService(MailApi.class);
-        this.killMailApi = client.createService(KillmailsApi.class);
+        this.mailApi = rf.create(MailApi.class);
+        this.killMailApi = rf.create(KillmailsApi.class);
         this.datasource = datasource;
     }
 

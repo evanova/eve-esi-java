@@ -13,3 +13,5 @@ hs_err_pid*
 client/generated/
 client/build/
 .idea/
+swagger/generated/
+swagger/build/
