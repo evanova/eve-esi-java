@@ -7,6 +7,8 @@ public interface ESIService {
 
     Character getCharacter(final Long charID);
 
+    Location getCharacterLocation(final Long charID);
+
     Calendar getCalendar(final Long charID, final Long afterEventID);
 
     boolean postCalendarEvent(Long charID, Long eventID, Calendar.Event.Response response);

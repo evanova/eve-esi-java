@@ -1,10 +1,9 @@
 package org.devfleet.esi.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.exceptions.OAuthException;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import com.google.gson.Gson;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,14 +18,14 @@ import org.devfleet.esi.ESIService;
 import org.devfleet.esi.ESIStore;
 import org.devfleet.esi.ESIToken;
 import org.devfleet.esi.KillMail;
+import org.devfleet.esi.Location;
 import org.devfleet.esi.Mail;
 import org.devfleet.esi.Mailbox;
-import org.devfleet.esi.api.CharacterApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -106,9 +105,9 @@ public class ESIRetrofit implements ESIService {
         }
     }
 
-    private final CharacterAPIImpl characterApi;
-    private final CorporationAPIImpl corporationApi;
-    private final MailAPIImpl mailAPIApi;
+    private final CharacterRetrofit characterApi;
+    private final CorporationRetrofit corporationApi;
+    private final MailRetrofit mailAPIApi;
 
     private final String host;
 
@@ -163,19 +162,19 @@ public class ESIRetrofit implements ESIService {
                     .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
         }
 
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        final Converter.Factory jackson = JacksonConverterFactory.create(mapper);
+        final Gson gson = new Gson();
+        final Converter.Factory mapper = GsonConverterFactory.create(gson);
 
         Retrofit rf =
                 new Retrofit.Builder()
                         .baseUrl("https://" + host + "/")
-                        .addConverterFactory(jackson)
+                        .addConverterFactory(mapper)
                         .client(retrofitClient.build())
                         .build();
-        this.characterApi = new CharacterAPIImpl(rf, "tranquility");
-        this.corporationApi = new CorporationAPIImpl(rf, "tranquility");
-        this.mailAPIApi = new MailAPIImpl(rf, "tranquility");
+
+        this.characterApi = new CharacterRetrofit(rf, "tranquility");
+        this.corporationApi = new CorporationRetrofit(rf, "tranquility");
+        this.mailAPIApi = new MailRetrofit(rf, "tranquility");
     }
 
     @Override
@@ -185,8 +184,19 @@ public class ESIRetrofit implements ESIService {
             return this.characterApi.getCharacter(charID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public Location getCharacterLocation(Long charID) {
+        try {
+            verify();
+            return this.characterApi.getCharacterLocation(charID);
+        }
+        catch (IOException e) {
+            LOG.error(e.getLocalizedMessage(), e);
             return null;
         }
     }
@@ -198,8 +208,7 @@ public class ESIRetrofit implements ESIService {
             return this.characterApi.getCalendar(charID, afterEventID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return null;
         }
 
@@ -212,8 +221,7 @@ public class ESIRetrofit implements ESIService {
             return this.characterApi.postCalendarEvent(charID, eventID, response);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return false;
         }
     }
@@ -225,8 +233,7 @@ public class ESIRetrofit implements ESIService {
             return this.corporationApi.getCorporation(corpID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return null;
         }
     }
@@ -238,8 +245,7 @@ public class ESIRetrofit implements ESIService {
             return this.corporationApi.getMembers(corpID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -252,8 +258,7 @@ public class ESIRetrofit implements ESIService {
 
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return false;
         }
     }
@@ -265,8 +270,7 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.getMails(charID, afterMailID, labels);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -278,8 +282,7 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.getMailboxes(charID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getLocalizedMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -291,7 +294,6 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.getMailContent(charID, mailID);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return null;
         }
@@ -304,7 +306,6 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.postMail(charID, mail);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return null;
         }
@@ -318,7 +319,6 @@ public class ESIRetrofit implements ESIService {
 
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return false;
         }
@@ -331,7 +331,6 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.createMailbox(charID, mailbox);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return false;
         }
@@ -344,7 +343,6 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.getKillMails(charID, maxCount, maxKillID, withContent);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return Collections.emptyList();
         }
@@ -357,7 +355,6 @@ public class ESIRetrofit implements ESIService {
             return this.mailAPIApi.getKillMail(killMail);
         }
         catch (IOException e) {
-            LOG.warn(e.getLocalizedMessage(), e);
             LOG.error(e.getLocalizedMessage());
             return null;
         }

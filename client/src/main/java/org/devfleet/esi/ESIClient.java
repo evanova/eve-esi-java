@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class ESIClient {
     private static final Logger LOG = LoggerFactory.getLogger(ESIClient.class);
 
     private static final String LOGIN = "login.eveonline.com";
-    private static final String ESI = "esi.tech.ccp.is";
+    private static final String ESI = "esi.tech.ccp.is/latest";
 
     private static final ESIStore STORE = new ESIStore() {
         private Map<String, ESIToken> map = new HashMap<>();

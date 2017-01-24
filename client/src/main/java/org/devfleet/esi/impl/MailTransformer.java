@@ -1,25 +1,16 @@
 package org.devfleet.esi.impl;
 
-import org.devfleet.esi.Calendar;
-import org.devfleet.esi.Character;
-import org.devfleet.esi.Corporation;
 import org.devfleet.esi.KillMail;
 import org.devfleet.esi.Mail;
 import org.devfleet.esi.Mailbox;
 import org.devfleet.esi.model.CharacterscharacterIdmailRecipients;
 import org.devfleet.esi.model.CharacterscharacterIdmailRecipients1;
-import org.devfleet.esi.model.GetCharactersCharacterIdCalendar200Ok;
-import org.devfleet.esi.model.GetCharactersCharacterIdCalendarEventIdOk;
-import org.devfleet.esi.model.GetCharactersCharacterIdCorporationhistory200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdKillmailsRecent200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdMail200Ok;
 import org.devfleet.esi.model.GetCharactersCharacterIdMailLabelsOkLabels;
 import org.devfleet.esi.model.GetCharactersCharacterIdMailMailIdOk;
 import org.devfleet.esi.model.GetCharactersCharacterIdMailMailIdOkRecipients;
-import org.devfleet.esi.model.GetCharactersCharacterIdOk;
-import org.devfleet.esi.model.GetCorporationsCorporationIdAlliancehistory200Ok;
-import org.devfleet.esi.model.GetCorporationsCorporationIdMembers200Ok;
-import org.devfleet.esi.model.GetCorporationsCorporationIdOk;
+import org.devfleet.esi.model.GetKillmailsKillmailIdKillmailHashOk;
 import org.devfleet.esi.model.PostCharactersCharacterIdMailMail;
 import org.devfleet.esi.model.PutCharactersCharacterIdMailMailIdContents;
 
@@ -27,45 +18,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-class ESITransformer {
+final class MailTransformer {
 
-    private ESITransformer() {}
-
-    public static Character transform(final long charID, final GetCharactersCharacterIdOk c) {
-        final Character character = new Character(charID);
-
-        return character;
-    }
-
-    public static Corporation transform(final long corpID, final GetCorporationsCorporationIdOk c) {
-        final Corporation corporation = new Corporation(corpID);
-
-        return corporation;
-    }
-
-    public static Character.History transform(GetCharactersCharacterIdCorporationhistory200Ok h) {
-        final Character.History history = new Character.History();
-        return history;
-    }
-
-    public static Corporation.History transform(GetCorporationsCorporationIdAlliancehistory200Ok h) {
-        final Corporation.History history = new Corporation.History();
-        return history;
-    }
-
-    public static Corporation.Member transform(GetCorporationsCorporationIdMembers200Ok m) {
-        final Corporation.Member member = new Corporation.Member();
-
-        return member;
-    }
-
-    public static Calendar.Event transform(
-            GetCharactersCharacterIdCalendar200Ok meta,
-            GetCharactersCharacterIdCalendarEventIdOk details) {
-        final Calendar.Event event = new Calendar.Event(Long.valueOf(meta.getEventId()));
-
-        return event;
-    }
+    private MailTransformer() {}
 
     public static Mail transform(GetCharactersCharacterIdMailMailIdOk object, final Long mailId) {
         Mail mail = new Mail();
@@ -117,6 +72,12 @@ class ESITransformer {
         contents.setLabels(new ArrayList<>(mail.getLabels().keySet()));
         contents.setRead(mail.getRead());
         return contents;
+    }
+
+    public static KillMail transform(GetKillmailsKillmailIdKillmailHashOk object) {
+        KillMail km = new KillMail();
+        km.setId(object.getKillmailId().longValue());//TODO
+        return km;
     }
 
     public static KillMail transform(GetCharactersCharacterIdKillmailsRecent200Ok object) {
