@@ -23,6 +23,8 @@ public class ESIClient {
     private static final String LOGIN = "login.eveonline.com";
     private static final String ESI = "esi.tech.ccp.is/latest";
 
+    private static final String AGENT = "eve-esi-java (https://github.com/evanova/eve-esi-java)";
+
     private static final ESIStore STORE = new ESIStore() {
         private Map<String, ESIToken> map = new HashMap<>();
 
@@ -73,11 +75,11 @@ public class ESIClient {
         private String clientKey;
         private String clientRedirect = "http://localhost/redirect";
 
-        private String userAgent = null;
+        private String userAgent = AGENT;
+        private long timeout = 30L * 1000L;
 
         public Builder() {
             this.scopes = new ArrayList<>();
-           // this.scopes.addAll(Arrays.asList(ESIAccess.CHARACTER_SCOPES));
         }
 
         public ESIClient.Builder store(final ESIStore store) {
@@ -110,6 +112,12 @@ public class ESIClient {
             return this;
         }
 
+        public ESIClient.Builder timeout(final long timeoutInMillis) {
+            this.timeout = timeoutInMillis;
+            return this;
+        }
+
+
         public ESIClient.Builder scopes(final String... scopes) {
             for (String s: scopes) {
                 if (!this.scopes.contains(s)) {
@@ -133,6 +141,7 @@ public class ESIClient {
                     this.clientRedirect,
                     this.userAgent,
                     this.store,
+                    this.timeout,
                     this.scopes.toArray(new String[this.scopes.size()]));
         }
     }
@@ -144,6 +153,7 @@ public class ESIClient {
     private final String userAgent;
 
     private final ESIStore store;
+    private final long timeout;
 
     private ESIClient(
             final String loginHost,
@@ -153,12 +163,13 @@ public class ESIClient {
             final String callback,
             final String userAgent,
             final ESIStore store,
+            final long timeout,
             final String... scopes) {
 
         this.esiHost = esiHost;
         this.loginHost = loginHost;
         this.userAgent = userAgent;
-
+        this.timeout = timeout;
         this.store = store;
 
         StringBuilder scope = new StringBuilder();
@@ -221,11 +232,11 @@ public class ESIClient {
     }
 
     public ESIService newESIService() {
-        return new ESIRetrofit(this.esiHost, this.loginHost, this.oAuth, this.store);
+        return new ESIRetrofit(this.esiHost, this.loginHost, this.oAuth, this.store, this.userAgent, this.timeout, null);
     }
 
     public ESIService newESIService(final String refresh) {
-        return new ESIRetrofit(this.esiHost, this.loginHost, this.oAuth, this.store, refresh, this.userAgent);
+        return new ESIRetrofit(this.esiHost, this.loginHost, this.oAuth, this.store, this.userAgent, this.timeout, refresh);
     }
 
     private ESIToken save(final OAuth2AccessToken token) {

@@ -30,18 +30,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ESIRetrofit implements ESIService {
 
-/*
-    interface VerifyService {
-        @GET("/oauth/verify")
-        Call<CrestCharacterStatus> getVerification(@Header("Authorization") String token);
-    }*/
-
     private static final Logger LOG = LoggerFactory.getLogger(ESIRetrofit.class);
-
-    private static final String AGENT = "eve-esi-java (https://github.com/evanova/eve-esi-java)";
 
     private static final class ClientInterceptor implements Interceptor {
         private final ESIRetrofit cr;
@@ -119,26 +112,10 @@ public class ESIRetrofit implements ESIService {
             final String host,
             final String login,
             final OAuth20Service oAuth,
-            final ESIStore store) {
-        this(host, login, oAuth, store, null, AGENT);
-    }
-
-    protected ESIRetrofit(
-            final String host,
-            final String login,
-            final OAuth20Service oAuth,
             final ESIStore store,
+            final String agent,
+            final long timeout,
             final String refresh) {
-        this(host, login, oAuth, store, refresh, AGENT);
-    }
-
-    public ESIRetrofit(
-            final String host,
-            final String login,
-            final OAuth20Service oAuth,
-            final ESIStore store,
-            final String refresh,
-            final String agent) {
 
         Validate.isTrue(StringUtils.isNotBlank(host), "host parameter cannot be empty.");
         Validate.isTrue(StringUtils.isNotBlank(login), "login parameter cannot be empty.");
@@ -154,7 +131,8 @@ public class ESIRetrofit implements ESIService {
 
         OkHttpClient.Builder retrofitClient =
                 new OkHttpClient.Builder()
-                        .addInterceptor(new UserAgentInterceptor(host, StringUtils.isBlank(agent) ? AGENT : agent))
+                        .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .addInterceptor(new UserAgentInterceptor(host, agent))
                         .addInterceptor(new ClientInterceptor(this))
                         .addInterceptor(new RetryInterceptor(this));
         if (LOG.isDebugEnabled()) {
