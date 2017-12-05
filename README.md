@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/evanova/eve-esi-java.svg?branch=master)](https://travis-ci.org/evanova/eve-esi-java)
+# THIS PROJECT IS NO LONGER MAINTAINED
 
 # EVE Online Swagger Interface in Java
 
